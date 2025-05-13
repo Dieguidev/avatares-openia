@@ -1,5 +1,5 @@
 {
-  "name": "1.traducciones-openia",
+  "name": "avatar-openia",
   "version": "1.0.0",
   "description": "proyecto de traducciones usando JavaScript y el api de openai",
   "main": "app.js",
@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/Dieguidev/traducciones-openIA#readme",
   "dependencies": {
-    "1.traducciones-openia": "file:",
+    "avatar-openia": "file:",
     "axios": "^1.9.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
