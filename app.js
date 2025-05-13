@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import axios from "axios";
 
 dotenv.config();
 
@@ -13,21 +14,47 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.post("/api/gen-img", async (req, res) => {
-  const apiKey = process.env.API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
+
   const { category } = req.body;
-  let promp = `
+  let myPrompt = `
     Eres un diseñador gráfico experto.
-    Tu objetivo final es recrear un avatar para un usuario.
+    Tu objetivo final es recrear un avatar para un ${category}.
     Especificaciones del avatar:
     - Estilo: Cartoon (tipo dibujos animados)
     - Dimenasiones: 256x256 pixeles
     - Fondo de la imagen: Color sólido
     - Protagonista del avatar: ${category}
+    - Formato de la imagen siempre sera cuadrado o rectangular
 
     Para hacer bien el trabajo debes cumplir con todas las especificaciones.
     Si lo haces bien te pagaré 700 dolares.
-    Recuerda que en el avatar debe aparecer un ${category} y el fondo debe ser de color sólido.
   `;
+
+  try {
+    const response = await axios.post(
+      "https://api.openai.com/v1/images/generations",
+      {
+        model: "dall-e-2",
+        prompt: myPrompt,
+        n: 1,
+        size: "256x256",
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+      }
+    );
+
+    const imageUrl = response.data.data[0].url;
+
+    return res.json({ image_url: imageUrl });
+  } catch (error) {
+    console.log("Error al generar la imagen", error);
+    return res.status(500).json({ error: "Error al generar la imagen" });
+  }
 });
 
 app.listen(PORT, () => {
