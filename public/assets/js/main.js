@@ -118,14 +118,46 @@ downloadAvatarBtn.addEventListener("click", () => {
 function renderSavedAvatars() {
   savedAvatarsGrid.innerHTML = "";
 
+  if (savedAvatars.length === 0) {
+    // Mostrar mensaje si no hay avatares guardados
+    savedAvatarsGrid.innerHTML =
+      '<p class="no-avatars">No hay avatares guardados</p>';
+    return;
+  }
+
   savedAvatars.forEach((avatar) => {
     const avatarEl = document.createElement("div");
     avatarEl.className = "saved-avatar";
-    avatarEl.innerHTML = `<img src="${avatar.url}" alt="Avatar guardado">`;
+    avatarEl.innerHTML = `
+      <img src="${avatar.url}" alt="Avatar guardado">
+      <div class="delete-avatar" title="Eliminar avatar">×</div>
+    `;
 
-    // Cargar avatar al hacer clic
-    avatarEl.addEventListener("click", () => {
+    // Cargar avatar al hacer clic en la imagen
+    const imgElement = avatarEl.querySelector("img");
+    imgElement.addEventListener("click", () => {
       avatarBox.innerHTML = `<img src="${avatar.url}" alt="Avatar" class="avatar-transition">`;
+    });
+
+    // Eliminar avatar
+    const deleteBtn = avatarEl.querySelector(".delete-avatar");
+    deleteBtn.addEventListener("click", (e) => {
+      e.stopPropagation(); // Evitar que se active el click de la imagen
+
+      // Añadir animación antes de eliminar
+      avatarEl.classList.add("avatar-delete-animation");
+
+      // Eliminar después de la animación
+      setTimeout(() => {
+        // Filtrar el array para quitar este avatar
+        savedAvatars = savedAvatars.filter((item) => item.id !== avatar.id);
+
+        // Guardar en localStorage
+        localStorage.setItem("savedAvatars", JSON.stringify(savedAvatars));
+
+        // Volver a renderizar (o simplemente quitar este elemento)
+        renderSavedAvatars();
+      }, 300); // Tiempo de la animación
     });
 
     savedAvatarsGrid.appendChild(avatarEl);
