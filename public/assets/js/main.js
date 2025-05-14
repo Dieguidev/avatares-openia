@@ -56,3 +56,61 @@ generateBtn.addEventListener("click", async () => {
     loading.style.display = "none";
   }
 });
+
+// Funcionalidad para guardar avatares
+const saveAvatarBtn = document.getElementById("saveAvatar");
+const downloadAvatarBtn = document.getElementById("downloadAvatar");
+const savedAvatarsGrid = document.getElementById("savedAvatarsGrid");
+
+// Cargar avatares guardados si existen
+let savedAvatars = JSON.parse(localStorage.getItem("savedAvatars") || "[]");
+renderSavedAvatars();
+
+// Guardar avatar
+saveAvatarBtn.addEventListener("click", () => {
+  const avatarImg = avatarBox.querySelector("img");
+  if (avatarImg) {
+    const newAvatar = {
+      id: Date.now(),
+      url: avatarImg.src,
+      category: selectedCategory,
+    };
+
+    savedAvatars.push(newAvatar);
+    localStorage.setItem("savedAvatars", JSON.stringify(savedAvatars));
+    renderSavedAvatars();
+
+    // Feedback visual
+    saveAvatarBtn.textContent = "✅";
+    setTimeout(() => (saveAvatarBtn.textContent = "💾"), 1500);
+  }
+});
+
+// Descargar avatar
+downloadAvatarBtn.addEventListener("click", () => {
+  const avatarImg = avatarBox.querySelector("img");
+  if (avatarImg) {
+    const link = document.createElement("a");
+    link.href = avatarImg.src;
+    link.download = `avatar-${selectedCategory}-${Date.now()}.png`;
+    link.click();
+  }
+});
+
+// Renderizar avatares guardados
+function renderSavedAvatars() {
+  savedAvatarsGrid.innerHTML = "";
+
+  savedAvatars.forEach((avatar) => {
+    const avatarEl = document.createElement("div");
+    avatarEl.className = "saved-avatar";
+    avatarEl.innerHTML = `<img src="${avatar.url}" alt="Avatar guardado">`;
+
+    // Cargar avatar al hacer clic
+    avatarEl.addEventListener("click", () => {
+      avatarBox.innerHTML = `<img src="${avatar.url}" alt="Avatar" class="avatar-transition">`;
+    });
+
+    savedAvatarsGrid.appendChild(avatarEl);
+  });
+}
