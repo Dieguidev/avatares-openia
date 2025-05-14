@@ -24,7 +24,9 @@ generateBtn.addEventListener("click", async () => {
     let data = await response.json();
     //Incrustar la imagen en la caja
     if (data && data.image_url) {
-      avatarBox.innerHTML = `<img src="${data.image_url}" alt="Avatar" />`;
+      avatarBox.innerHTML = `<img src="${data.image_url}" alt="Avatar" class="avatar-transition">`;
+      avatarBox.classList.add("pulse");
+      setTimeout(() => avatarBox.classList.remove("pulse"), 1500);
     } else {
       alert("No se ha podido generar la imagen");
     }
