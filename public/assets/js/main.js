@@ -1,46 +1,38 @@
-let translateButton = document.querySelector("#translateButton");
+const generateBtn = document.querySelector(".btn-generate");
+const avatarBox = document.querySelector(".avatar-box");
+const loading = document.querySelector(".loading");
+const categoryselector = document.querySelector(".category-selector");
 
-translateButton.addEventListener("click", async () => {
-  const inputText = document.querySelector("#inputText");
+loading.style.display = "none";
 
-  const text = document.querySelector("#inputText").value.trim();
+generateBtn.addEventListener("click", async () => {
+  //sacar la categoria seleccionada
+  const category = categoryselector.value;
 
-  const targetLang = document.querySelector("#targetLang").value.trim();
-  if (text === "") {
-    alert("Por favor, ingresa un texto para traducir.");
-    return false;
-  }
+  //mostrar cargando
+  loading.style.display = "block";
 
-  const userMessage = document.createElement("div");
-  userMessage.className = "chat__message chat__message--user";
-  userMessage.textContent = text;
-
-  const messagesContainer = document.querySelector(".chat__messages");
-  messagesContainer.appendChild(userMessage);
-  messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
+  //peticion ajax al backend
   try {
-    const response = await fetch("api/traducir", {
+    let response = await fetch("http://localhost:3000/api/gen-img", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        text,
-        targetLang,
-      }),
+      body: JSON.stringify({ category }),
     });
-
-    const data = await response.json();
-
-    const botMessage = document.createElement("div");
-    botMessage.className = "chat__message chat__message--bot";
-    botMessage.textContent = data.translatedText;
-    messagesContainer.appendChild(botMessage);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    let data = await response.json();
+    //Incrustar la imagen en la caja
+    if (data && data.image_url) {
+      avatarBox.innerHTML = `<img src="${data.image_url}" alt="Avatar" />`;
+    } else {
+      alert("No se ha podido generar la imagen");
+    }
   } catch (error) {
     console.log(error);
+    alert("Error al generar la imagen");
+  } finally {
+    //ocultar cargando
+    loading.style.display = "none";
   }
-
-  inputText.value = "";
 });
