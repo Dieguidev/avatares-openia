@@ -1,5 +1,6 @@
 const generateBtn = document.querySelector(".btn-generate");
 const avatarBox = document.querySelector(".avatar-box");
+const loadingContainer = document.querySelector(".loading-container");
 const loading = document.querySelector(".loading");
 const categoryselector = document.querySelector(".category-selector");
 
@@ -24,11 +25,13 @@ categoryCards[0].classList.add("active");
 loading.style.display = "none";
 
 generateBtn.addEventListener("click", async () => {
+  // Deshabilitar botón durante la generación
+  generateBtn.disabled = true;
   //sacar la categoria seleccionada
   // const category = categoryselector.value;
 
   //mostrar cargando
-  loading.style.display = "block";
+  loadingContainer.style.display = "flex";
 
   //peticion ajax al backend
   try {
@@ -42,7 +45,19 @@ generateBtn.addEventListener("click", async () => {
     let data = await response.json();
     //Incrustar la imagen en la caja
     if (data && data.image_url) {
-      avatarBox.innerHTML = `<img src="${data.image_url}" alt="Avatar" class="avatar-transition">`;
+      // Actualizar avatar con la nueva imagen
+      const imgElement =
+        avatarBox.querySelector("img") || document.createElement("img");
+      imgElement.src = data.image_url;
+      imgElement.alt = "Avatar";
+      imgElement.className = "avatar-transition";
+
+      // Si no existe la imagen, agregarla
+      if (!avatarBox.querySelector("img")) {
+        avatarBox.appendChild(imgElement);
+      }
+
+      // Efecto visual
       avatarBox.classList.add("pulse");
       setTimeout(() => avatarBox.classList.remove("pulse"), 1500);
     } else {
@@ -53,7 +68,9 @@ generateBtn.addEventListener("click", async () => {
     alert("Error al generar la imagen");
   } finally {
     //ocultar cargando
-    loading.style.display = "none";
+    loadingContainer.style.display = "none";
+    // Habilitar botón nuevamente
+    generateBtn.disabled = false;
   }
 });
 
